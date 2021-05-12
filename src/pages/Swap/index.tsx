@@ -1,7 +1,7 @@
 import { CurrencyAmount, JSBI, Token, Trade } from '@pancakeswap-libs/sdk'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ArrowDown } from 'react-feather'
-import { CardBody, ArrowDownIcon, Button, IconButton, Text } from '@pancakeswap-libs/uikit'
+import { CardBody, ArrowDownIcon, Button, IconButton, Text } from '@ricefarm/uikit'
 import { ThemeContext } from 'styled-components'
 import AddressInputPanel from 'components/AddressInputPanel'
 import Card, { GreyCard } from 'components/Card'
@@ -17,6 +17,7 @@ import TradePrice from 'components/swap/TradePrice'
 import TokenWarningModal from 'components/TokenWarningModal'
 import SyrupWarningModal from 'components/SyrupWarningModal'
 import SafeMoonWarningModal from 'components/SafeMoonWarningModal'
+import TeslaSafeWarningModal from 'components/TeslaSafeWarningModal'
 import ProgressSteps from 'components/ProgressSteps'
 
 import { INITIAL_ALLOWED_SLIPPAGE } from 'constants/index'
@@ -229,7 +230,7 @@ const Swap = () => {
   // If so, they will be alerted with a warning message.
   const checkForWarning = useCallback(
     (selected: string, purchaseType: string) => {
-      if (['SYRUP', 'SAFEMOON'].includes(selected)) {
+      if (['SYRUP', 'SAFEMOON', 'TeslaSafe'].includes(selected)) {
         setTransactionWarning({
           selectedToken: selected,
           purchaseType,
@@ -247,6 +248,9 @@ const Swap = () => {
         checkForWarning(inputCurrency.symbol, 'Selling')
       }
       if (inputCurrency.symbol === 'SAFEMOON') {
+        checkForWarning(inputCurrency.symbol, 'Selling')
+      }
+      if (inputCurrency.symbol === 'TeslaSafe') {
         checkForWarning(inputCurrency.symbol, 'Selling')
       }
     },
@@ -268,6 +272,9 @@ const Swap = () => {
       if (outputCurrency.symbol === 'SAFEMOON') {
         checkForWarning(outputCurrency.symbol, 'Buying')
       }
+      if (outputCurrency.symbol === 'TeslaSafe') {
+        checkForWarning(outputCurrency.symbol, 'Buying')
+      }
     },
     [onCurrencySelection, checkForWarning]
   )
@@ -284,6 +291,7 @@ const Swap = () => {
         transactionType={transactionWarning.purchaseType}
         onConfirm={handleConfirmWarning}
       />
+      <TeslaSafeWarningModal isOpen={transactionWarning.selectedToken === 'TeslaSafe'} onConfirm={handleConfirmWarning} />
       <SafeMoonWarningModal isOpen={transactionWarning.selectedToken === 'SAFEMOON'} onConfirm={handleConfirmWarning} />
       <CardNav />
       <AppBody>
